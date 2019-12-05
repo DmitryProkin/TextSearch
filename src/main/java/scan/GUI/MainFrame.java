@@ -1,5 +1,6 @@
-package scan;
+package scan.GUI;
 
+import scan.Search.SearchTread;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,10 @@ public class MainFrame extends JFrame {
     private JLabel message = new JLabel();
     private JButton btnSearch= new JButton("Поиск");
     private JButton btnDirectory = new JButton("Выбрать директорию");
+    private JButton btnSelectAll = new JButton("Выделить все");
+    private JButton btnRemoveSelect = new JButton("Убрать выделения");
+    private JButton btnSelectNext = new JButton("Вперед");
+    private JButton btnSelectBack = new JButton("Назад");
     private JLabel textDirectory1 = new JLabel("Путь ");
     private JLabel textDirectory2 = new JLabel("Директория не выбрана ");
     private JPanel panelTree = new JPanel();
@@ -25,13 +30,9 @@ public class MainFrame extends JFrame {
     private int width =1000;
     private int height = 800;
 
-    private class FileActionListener implements ActionListener{
-        public void actionPerformed(ActionEvent a){
 
-        }
-    }
 
-    MainFrame(){
+    public MainFrame(){
 
         super();
 
@@ -72,49 +73,46 @@ public class MainFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectedFile!=null){
-                    Thread thread = new SearchTread(search.getText(),selectedFile.toString(),extension.getText(),tabbedPane,width,height);
+                    Thread thread = new SearchTread(search.getText(),selectedFile.toString(),extension.getText(),
+                            tabbedPane,width,height,btnSelectAll,btnSelectNext,btnSelectBack,btnRemoveSelect);
                     thread.start();
                 }
 
             }
         });
-        //ActionListener actionListener = new FileActionListener();
         layout.setHorizontalGroup(
                 layout.createParallelGroup()
                 .addComponent(message)
-                .addGroup(
-                        layout.createSequentialGroup()
+                .addGroup(layout.createSequentialGroup()
                                 .addComponent(textSearch)
                                 .addGap(25)
                                 .addComponent(search)
                 )
-                .addGroup(
-                        layout.createSequentialGroup()
+                .addGroup(layout.createSequentialGroup()
                                 .addComponent(textExtension)
                                 .addGap(10)
                                 .addComponent(extension)
                 )
-                .addGroup(
-                        layout.createSequentialGroup()
+                .addGroup(layout.createSequentialGroup()
                                 .addComponent(textDirectory1)
                                 .addGap(10)
                                 .addComponent(textDirectory2)
                                 .addComponent(btnDirectory)
                 )
-                .addGroup(
-                        layout.createSequentialGroup()
+                .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnSearch)
                 )
-                .addGroup(
-                        layout.createSequentialGroup()
-                               // .addComponent(panelTree)
+                .addGroup(layout.createSequentialGroup()
                                 .addComponent(tabbedPane)
-                               /* .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(tabbedPane)
-                                        .addComponent(panelText)
-                                )*/
-
                 )
+                .addGroup(layout.createSequentialGroup()
+                        .addGap(530)
+                        .addComponent(btnSelectAll)
+                        .addComponent(btnSelectBack)
+                        .addComponent(btnSelectNext)
+                        .addComponent(btnRemoveSelect)
+                )
+
         );
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
@@ -145,14 +143,13 @@ public class MainFrame extends JFrame {
                         )
                         .addGroup(
                                 layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        //.addComponent(panelTree)
                                         .addComponent(tabbedPane)
-                                     /*   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(tabbedPane)
-                                                .addComponent(panelText)
-
-                                        )*/
-
+                        )
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(btnSelectAll)
+                                .addComponent(btnSelectBack)
+                                .addComponent(btnSelectNext)
+                                .addComponent(btnRemoveSelect)
                         )
         );
         setSize(width, height);

@@ -1,27 +1,28 @@
-package scan;
+package scan.Model;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class TreeModl implements TreeModel {
 
-    private  String root;
+    private String root;
     private List<String> nodeList = new ArrayList<>();
 
-    TreeModl(String root, List<File> fileList){
+    public TreeModl(String root, HashMap<File, List<Integer>> fileList) {
 
-        this.root=root;
-        for (File currentFile: fileList){
+        this.root = root;
+        for (File currentFile : fileList.keySet()) {
 
             String nodePath = root;
 
-            for(String nodeName :currentFile.toString().split("/")){
-
+            for (String nodeName : currentFile.toString().split("/")) {
+                //Cобираем путь файла
                 String s = nodeName.replace(root + "\\", "");
                 String[] strName = s.split(Pattern.quote("\\"));
                 int strNameSize = strName.length;
@@ -32,7 +33,7 @@ public class TreeModl implements TreeModel {
                 }
                 nodePath += "/" + strName[strNameSize - 1];
 
-                    if(!nodeList.contains(nodePath)){
+                if (!nodeList.contains(nodePath)) {
                     nodeList.add(nodePath);
                 }
 
@@ -56,9 +57,9 @@ public class TreeModl implements TreeModel {
     private List<String> getChildList(String parent) {
         ArrayList<String> list = new ArrayList<>();
 
-        for (String currentNode  : nodeList){
+        for (String currentNode : nodeList) {
             //Начинается ли строка с указанного прифекса ?
-            if (currentNode.startsWith(parent)&& (currentNode.split("/").length - parent.split("/").length)==1){
+            if (currentNode.startsWith(parent) && (currentNode.split("/").length - parent.split("/").length) == 1) {
                 list.add(currentNode);
             }
         }
@@ -67,14 +68,14 @@ public class TreeModl implements TreeModel {
 
     @Override
     public int getChildCount(Object parent) {
-       List<String> listChild = getChildList(parent.toString());
-       return listChild.size();
+        List<String> listChild = getChildList(parent.toString());
+        return listChild.size();
     }
 
     @Override
     public boolean isLeaf(Object node) {
         List<String> listChild = getChildList(node.toString());
-        return  listChild.size() ==0;
+        return listChild.size() == 0;
     }
 
     @Override
@@ -85,9 +86,8 @@ public class TreeModl implements TreeModel {
     @Override
     public int getIndexOfChild(Object parent, Object child) {
         List<String> listChild = getChildList(parent.toString());
-        if(listChild.contains(child.toString())){
+        if (listChild.contains(child.toString())) {
             return 1;
-
         }
         return -1;
     }

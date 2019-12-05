@@ -1,4 +1,4 @@
-package scan;
+package scan.GUI;
 
 import javax.swing.*;
 import java.awt.*;
