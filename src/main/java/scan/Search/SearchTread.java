@@ -1,8 +1,7 @@
 package scan.Search;
 
 import scan.GUI.ResultPanel;
-import scan.Model.TreeModl;
-import scan.Search.LineHighlightPainter;
+import scan.Model.ModelTree;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -28,11 +27,13 @@ public class SearchTread extends Thread {
     private JButton btnSelectNext;
     private JButton btnSelectBack;
     private JButton btnRemoveSelect;
+    private JTree tree;
     private int width;
     private int height;
     private static int indexCourser;
     private File fileSelect;
     private LineHighlightPainter highlight;
+    private Caret caret;
 
     private HashMap<File, List<Integer>> mapFiles = new HashMap<>();
 
@@ -56,7 +57,6 @@ public class SearchTread extends Thread {
         JPanel tabPanel = new JPanel();
         tabPanel.setLayout(new BorderLayout(10, 10));
 
-
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout(10, 10));
         tabPanel.add(contentPanel);
@@ -68,17 +68,17 @@ public class SearchTread extends Thread {
         scrollPane.setPreferredSize(new Dimension(700, 500));
 
         // Создание курсора
-        Caret caret = textArea.getCaret();
+        caret = textArea.getCaret();
         caret.setVisible(true);
 
         try {
-            ResearchFile researchFile = new ResearchFile();
+            FullTextFinder fullTextFinder = new FullTextFinder();
             //Вызов метода для поиска файлов удовлетворяющие заданным условиям
-            mapFiles = researchFile.tree(path, extension, search);
+            mapFiles = fullTextFinder.tree(path, extension, search);
             if (!mapFiles.isEmpty()) {
-                TreeModl model = new TreeModl(path, mapFiles);
+                ModelTree model = new ModelTree(path, mapFiles);
 
-                JTree tree = new JTree(model);
+                tree = new JTree(model);
                 JScrollPane scrollPanels = new JScrollPane(tree);
                 scrollPanels.setViewportView(tree);
                 scrollPanels.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -86,30 +86,8 @@ public class SearchTread extends Thread {
                 scrollPanels.setPreferredSize(new Dimension(250, 500));
 
                 tabPanel.add(scrollPanels, BorderLayout.LINE_START);
+                mouseListenerTree();
 
-                tree.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        highlight =null;
-                        indexCourser = 0;
-                        TreePath treePath = tree.getPathForLocation(e.getX(), e.getY());
-
-                        if (treePath != null) {
-                            String pathSelect = treePath.getLastPathComponent().toString();
-                            System.out.println(pathSelect);
-                            fileSelect = new File(pathSelect);
-                            try {
-                                BufferedReader input = new BufferedReader(new InputStreamReader(
-                                        new FileInputStream(fileSelect)));
-                                textArea.read(input, "READING FILE :-)");
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
-
-                        }
-                    }
-                });
             }
             else{
                 JLabel resultNull = new JLabel("По заданному поиску ничего не найдено! " );
@@ -118,62 +96,11 @@ public class SearchTread extends Thread {
                 tabPanel.add(resultNull, BorderLayout.LINE_START);
                 tabPanel.setBackground(Color.WHITE);
             }
-            btnSelectAll.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    Document doc = textArea.getDocument();
-                    String text = "";
-                    try {
-                        text = doc.getText(0, doc.getLength());
-                    } catch (BadLocationException ex) {
-                        ex.printStackTrace();
-                    }
-                    if (!search.isEmpty() && !mapFiles.isEmpty()) {
-                        highlight = new LineHighlightPainter(search, text, textArea, mapFiles, fileSelect);
-                        caret.setDot(mapFiles.get(fileSelect).get(0));
-                    }
-                }
-            });
-            btnSelectNext.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    indexCourser++;
-                    // Установление каретки
-                    if (!mapFiles.isEmpty()){
-                        int position = mapFiles.get(fileSelect).get(indexCourser);
-                        caret.setDot(position);
-                    }
-                    else{
-                        caret.setDot(indexCourser);
-                    }
-                }
-            });
 
-            btnSelectBack.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (indexCourser > 0) {
-                        indexCourser--;
-                    }
-                    // Установление каретки
-                    if (!mapFiles.isEmpty()){
-                        int position = mapFiles.get(fileSelect).get(indexCourser);
-                        caret.setDot(position);
-                    }
-                    else{
-                        caret.setDot(indexCourser);
-                    }
-                }
-            });
-
-            btnRemoveSelect.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (!search.isEmpty() && !mapFiles.isEmpty()) {
-                        highlight.removeHighlights(textArea);
-                    }
-                }
-            });
+            actionListenerBtnSelectAll();
+            actionListenerBtnSelectNext();
+            actionListenerBtnSelectBack();
+            actionListenerRemoveSelect();
 
         } catch (Exception e) {
             handleException(tabPanel, e);
@@ -181,10 +108,106 @@ public class SearchTread extends Thread {
 
         tabPanel.add(scrollPane, BorderLayout.LINE_END);
         tabbedPane.add(tabPanel);
-        tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(tabPanel), ResultPanel.getTitle(tabbedPane, tabPanel, "Данное выражение найдено в следующих файлах:"));
+
+        int index = tabbedPane.indexOfComponent(tabPanel);
+        String textForPanel ="Данное выражение найдено в следующих файлах:";
+        JPanel panel = ResultPanel.getTitle(tabbedPane, tabPanel, textForPanel);
+        tabbedPane.setTabComponentAt(index, panel);
 
     }
 
+    private void mouseListenerTree(){
+        tree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                highlight =null;
+                indexCourser = 0;
+                TreePath treePath = tree.getPathForLocation(e.getX(), e.getY());
+
+                if (treePath != null) {
+                    String pathSelect = treePath.getLastPathComponent().toString();
+                    System.out.println(pathSelect);
+                    fileSelect = new File(pathSelect);
+                    try {
+                        BufferedReader input = new BufferedReader(new InputStreamReader(
+                                new FileInputStream(fileSelect)));
+                        textArea.read(input, "READING FILE :-)");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+
+                }
+            }
+        });
+    }
+    private void actionListenerBtnSelectAll(){
+        btnSelectAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Document doc = textArea.getDocument();
+                String text = "";
+                try {
+                    text = doc.getText(0, doc.getLength());
+                } catch (BadLocationException ex) {
+                    ex.printStackTrace();
+                }
+                if (!search.isEmpty() && !mapFiles.isEmpty()) {
+                    highlight = new LineHighlightPainter(search, text, textArea, mapFiles, fileSelect);
+                    caret.setDot(mapFiles.get(fileSelect).get(0));
+                }
+            }
+        });
+    }
+
+    private void actionListenerBtnSelectNext(){
+        btnSelectNext.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (indexCourser<mapFiles.get(fileSelect).size()-1) {
+                    indexCourser++;
+                }
+                // Установление каретки
+                if (!mapFiles.isEmpty()){
+                    int position = mapFiles.get(fileSelect).get(indexCourser);
+                    caret.setDot(position);
+                }
+                else{
+                    caret.setDot(indexCourser);
+                }
+            }
+        });
+    }
+
+    private void actionListenerBtnSelectBack() {
+        btnSelectBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (indexCourser > 0) {
+                    indexCourser--;
+                }
+                // Установление каретки
+                if (!mapFiles.isEmpty()){
+                    int position = mapFiles.get(fileSelect).get(indexCourser);
+                    caret.setDot(position);
+                }
+                else{
+                    caret.setDot(indexCourser);
+                }
+            }
+        });
+    }
+
+    private void actionListenerRemoveSelect() {
+        btnRemoveSelect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!search.isEmpty() && !mapFiles.isEmpty()) {
+                    highlight.removeHighlights(textArea);
+                }
+            }
+        });
+    }
     private void handleException(JComponent hBox, Exception e) {
         hBox.add(new JLabel("Ошибка:" + e.getMessage()));
     }

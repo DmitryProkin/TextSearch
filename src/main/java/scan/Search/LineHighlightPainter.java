@@ -9,13 +9,15 @@ import java.util.List;
 public class LineHighlightPainter {
     String text;
     String searchTxt;
-    LineHighlightPainter(String searchTxt, String text, JTextComponent textComp, HashMap<File, List<Integer>> mapFiles, File fileSelect){
+    LineHighlightPainter(String searchTxt, String text, JTextComponent textComp, HashMap<File,
+                         List<Integer>> mapFiles, File fileSelect){
         this.text = text;
         this.searchTxt = searchTxt;
         highlight(textComp,searchTxt,mapFiles,fileSelect);
     }
-            public void highlight(JTextComponent textComp, String pattern, HashMap<File, List<Integer>> mapFiles, File fileSelect) {
-        // First remove all old highlights
+            public void highlight(JTextComponent textComp, String pattern,
+                                  HashMap<File, List<Integer>> mapFiles, File fileSelect) {
+       //Удалить старые выделения
         removeHighlights(textComp);
 
         try {
@@ -34,7 +36,6 @@ public class LineHighlightPainter {
         }
     }
 
-    // Removes only our private highlights
     public void removeHighlights(JTextComponent textComp) {
         Highlighter hilite = textComp.getHighlighter();
         Highlighter.Highlight[] hilites = hilite.getHighlights();
@@ -45,10 +46,9 @@ public class LineHighlightPainter {
             }
         }
     }
-    // An instance of the private subclass of the default highlight painter
+
     Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(Color.red);
 
-    // A private subclass of the default highlight painter
     class MyHighlightPainter
             extends DefaultHighlighter.DefaultHighlightPainter {
 

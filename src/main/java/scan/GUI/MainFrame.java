@@ -50,9 +50,8 @@ public class MainFrame extends JFrame {
         btnDirectory.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Устанавка свойства чтобы указывать только директорию
+                //Устанавка свойства,чтобы выбирать директорию
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fileChooser.setCurrentDirectory(new File ("/var/log" ));
                 //Возвращает состояние выбранной диеректори
                 int response = fileChooser.showOpenDialog(MainFrame.this);
                 switch(response){
@@ -117,32 +116,27 @@ public class MainFrame extends JFrame {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(message)
-                        .addGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addComponent(textSearch)
                                         .addGap(25)
                                         .addComponent(search)
                         )
-                        .addGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addComponent(textExtension)
                                         .addGap(10)
                                         .addComponent(extension)
                         )
-                        .addGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addComponent(textDirectory1)
                                         .addGap(10)
                                         .addComponent(textDirectory2)
                                         .addComponent(btnDirectory)
                         )
-                        .addGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addComponent(btnSearch)
 
                         )
-                        .addGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addComponent(tabbedPane)
                         )
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)

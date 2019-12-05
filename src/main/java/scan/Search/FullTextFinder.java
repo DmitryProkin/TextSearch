@@ -13,12 +13,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public class ResearchFile {
+public class FullTextFinder {
 
     private HashMap<File , List<Integer>> map = new HashMap<>();
 
-        //Возвращаемый HashMap содержит в себе файлы в которых найдено выражение в качестве ключа,
-        // и в качестве значения  List<Integer>, список позиций в которых встречается слово
+        //Возвращаемый HashMap содержит в качестве ключа файлы, в которых найдено выражение ,
+        // и значения  List<Integer>, список позиций в тексте, в которых обнаружено слово
     public HashMap<File, List<Integer>> tree(String path, String extension, String search) throws Exception {
 
         ArrayList<File> arrayList = new ArrayList<File>();
@@ -33,9 +33,6 @@ public class ResearchFile {
         return map;
     }
 
-//    public int getIndexStart(){
-//        return indexStart;
-//    }
     private void runSearch(File file,String search, List<File> arrayList ) throws FileNotFoundException {
         List<Integer> listStartIndex = new ArrayList<>();
         Scanner scanner = new Scanner(file);
@@ -54,8 +51,5 @@ public class ResearchFile {
             if (!listStartIndex.isEmpty()) {
                 map.put(file, listStartIndex);
             }
-
         }
-
     }
-

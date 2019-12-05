@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class TreeModl implements TreeModel {
+public class ModelTree implements TreeModel {
 
     private String root;
     private List<String> nodeList = new ArrayList<>();
 
-    public TreeModl(String root, HashMap<File, List<Integer>> fileList) {
+    public ModelTree(String root, HashMap<File, List<Integer>> fileList) {
 
         this.root = root;
         for (File currentFile : fileList.keySet()) {
