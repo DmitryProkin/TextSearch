@@ -2,6 +2,7 @@ package scan.Search;
 
 import scan.GUI.ResultPanel;
 import scan.Model.TreeModl;
+import scan.Search.LineHighlightPainter;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
