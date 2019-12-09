@@ -167,6 +167,7 @@ public class SearchTread extends Thread {
                 if (indexCourser<mapFiles.get(fileSelect).size()-1) {
                     indexCourser++;
                 }
+
                 // Установление каретки
                 if (!mapFiles.isEmpty()){
                     int position = mapFiles.get(fileSelect).get(indexCourser);
@@ -203,6 +204,8 @@ public class SearchTread extends Thread {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!search.isEmpty() && !mapFiles.isEmpty()) {
+                    indexCourser = 0;
+                    caret.setDot(indexCourser);
                     highlight.removeHighlights(textArea);
                 }
             }
